@@ -1,14 +1,17 @@
 var mongoose = require("mongoose");
 var Schema = mongoose.Schema;
+var uniqueValidator = require("mongoose-unique-validator");
 
-varArticleSchema = new Schema({
+var ArticleSchema = new Schema({
 	title: {
 		type: String,
-		required: true
+		required: true,
+		trim: true,
+		unique: true
 	},
 	link: {
 		type: String,
-		required: true
+		unique: true
 	},
 	comment: {
 		type: Schema.Types.ObjectId,
@@ -16,6 +19,7 @@ varArticleSchema = new Schema({
 	}
 });
 //This is my model from the above schema, using mongoose's model method//
-var Article = mongoose.model("Article", ArticleSchema);
 
+var Article = mongoose.model("Article", ArticleSchema);
+ArticleSchema.plugin(uniqueValidator);
 module.exports = Article;
