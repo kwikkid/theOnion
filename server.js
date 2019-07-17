@@ -36,6 +36,7 @@ app.get("/", function(req, res) {
 // GET route for scraping theonion website //
 
 app.get("/scrape", function(req, res) {
+	console.log("scraping...");
 	var result = {};
 	axios.get("https://www.theonion.com/").then(function(response) {
 		var $ = cheerio.load(response.data);
@@ -56,7 +57,7 @@ app.get("/scrape", function(req, res) {
 					console.log(err);
 				});
 		});
-		res.send("Scrape Complete");
+		res.redirect("/articles");
 	});
 });
 
@@ -71,6 +72,32 @@ app.get("/articles", function(req, res) {
 		});
 });
 
+app.put("/saved-articles/:id", function(req, res) {
+	var condition = req.params.id;
+	db.Article.update({ _id: condition }, { $set: { saved: true } })
+		.then(function(dbArticles) {
+			res.render("index");
+		})
+		.catch(function(err) {
+			res.json(err);
+		});
+	//here we store the ID supplied by the client. We use the ID to update.
+});
+// GET route for saved articles //
+app.get("/saved-articles", function(req, res) {
+	db.Article.find({}).then(function(dbArticles) {
+		res.render("saved", { db_articles: dbArticles });
+	});
+});
+
+app.get("/clear", function(req, res) {
+	db.Article.remove({}).then(function() {
+		res.render("index");
+	});
+});
+
+// POST route to add to saved articles //
+app.post("/saved-articles", function(req, res) {});
 app.listen(PORT, function() {
 	console.log("Listening on port:%s", PORT);
 });

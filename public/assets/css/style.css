@@ -2,4 +2,12 @@
 	background-color: black;
 }
 
+.badge-success {
+	padding-left: 5px;
+	padding-right: 5px;
+	background-color: #006b3a;
+}
 
+.btn-success {
+	background-color: #006b3a;
+}
