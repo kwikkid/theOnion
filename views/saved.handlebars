@@ -2,16 +2,19 @@
     <div id="articles-saved">
         {{#each db_articles}}
           {{#if this.saved}}
+          <div class="result-div">
           <div class="row">
               <div class="col-10">
+
                 <h3>
                     <pre>{{this.title}}</pre>
                 </h3>
                 <pre>{{this.link}}</pre>
               </div>
               <div class="col-2">
-                <button type="button" class="btn btn-success" data-id={{_id}}>Save Article</button>
+                <button type="button" class="btn add-note btn-success" data-id={{_id}}>Add Note</button>
               </div>
+            </div>
           </div>
                 {{/if}}
                   {{/each}}

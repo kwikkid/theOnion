@@ -33,31 +33,42 @@ mongoose.connect("mongodb://localhost/theOnionApp", { useNewUrlParser: true });
 app.get("/", function(req, res) {
 	res.redirect("/articles");
 });
-// GET route for scraping theonion website //
 
 app.get("/scrape", function(req, res) {
 	console.log("scraping...");
-	var result = {};
+	var result = [];
+	console.log("1");
 	axios.get("https://www.theonion.com/").then(function(response) {
+		console.log("2");
 		var $ = cheerio.load(response.data);
-		$("section.content-meta__headline__wrapper").each(function(i, element) {
+		console.log("3");
+		$(".content-meta__headline__wrapper").each(function(i, element) {
 			console.log("result variable");
-
-			result.title = $(this)
-				.children("a")
-				.attr("title");
-			result.link = $(this)
-				.children("a")
-				.attr("href");
-			db.Article.create(result)
-				.then(function(dbArticle) {
-					console.log(dbArticle);
-				})
-				.catch(function(err) {
-					console.log(err);
-				});
+			var content = {
+				title: $(this)
+					.children("a")
+					.attr("title"),
+				link: $(this)
+					.children("a")
+					.attr("href")
+			};
+			if (content.title && content.link) {
+				result.push(content);
+			}
 		});
-		res.redirect("/articles");
+
+		console.log("4");
+
+		db.Article.create(result)
+			.then(function(dbArticle) {
+				console.log("5");
+				console.log(dbArticle);
+				res.redirect("/articles");
+			})
+			.catch(function(err) {
+				console.log(err);
+				res.json(err);
+			});
 	});
 });
 
@@ -76,13 +87,14 @@ app.put("/saved-articles/:id", function(req, res) {
 	var condition = req.params.id;
 	db.Article.update({ _id: condition }, { $set: { saved: true } })
 		.then(function(dbArticles) {
-			res.render("index");
+			res.json({ ok: true });
 		})
 		.catch(function(err) {
-			res.json(err);
+			res.json({ ok: false, error: err });
 		});
 	//here we store the ID supplied by the client. We use the ID to update.
 });
+
 // GET route for saved articles //
 app.get("/saved-articles", function(req, res) {
 	db.Article.find({}).then(function(dbArticles) {

@@ -1,27 +1,15 @@
-$(".scrape").on("click", function() {
-	$.get("/scrape").then(function() {
-		alert("Scraped!");
-		location.reload("/articles");
-		// Reload the page to get the updated list
-	});
-});
-
-$(".btn-success").on("click", function() {
+$(".save-btn").on("click", function() {
 	var articleId = $(this).data("id");
 	$.ajax({
 		url: "/saved-articles/" + articleId,
 		type: "PUT",
 		data: articleId,
 		success: function(data) {
-			location.reload("/articles");
+			console.log(data);
+			if (data.ok) {
+				location.reload("/articles");
+			}
 		}
-	});
-	$(".badge-success").text(count); //make an update request that changes saved to true //
-});
-
-$("#saved-articles").on("click", function() {
-	$.get("/saved-articles").then(function(data) {
-		location.reload("/saved-articles");
 	});
 });
 
@@ -30,3 +18,30 @@ $("#clear").on("click", function() {
 		location.reload("/articles");
 	});
 });
+
+$(".add-note").on("click", function() {
+	var articleId = $(this).data("id");
+	var div = $(this).closest(".result-div");
+	var button = $("<button/>", {
+		id: articleId,
+		class: "btn btn-success",
+		title: "Save"
+	}).html("save");
+
+	// ("<button type='button' class='btn save-note btn-success' id=articleId>Save</button>");
+	div.append("<textarea></textarea>").after(button);
+});
+
+$(".save-note").on("click", function() {
+	console.log("click");
+	var articleId = $(this)
+		.parent(".save-btn")
+		.data("id");
+	console.log(articleId);
+});
+// $("#note-button").on("click", function() {
+// 	var articleId = $(this).data("id");
+// 	$.ajax({
+// 		url:
+// 	})
+// })
