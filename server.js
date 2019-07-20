@@ -67,7 +67,7 @@ app.get("/scrape", function(req, res) {
 			})
 			.catch(function(err) {
 				console.log(err);
-				res.json(err);
+				res.redirect("/articles");
 			});
 	});
 });
@@ -83,17 +83,21 @@ app.get("/articles", function(req, res) {
 		});
 });
 
-app.put("/saved-articles/:id", function(req, res) {
-	var condition = req.params.id;
-	db.Article.update({ _id: condition }, { $set: { saved: true } })
+app.post("/saved-articles/:id", function(req, res) {
+	db.Article.update({ _id: req.params.id }, { $set: { saved: true } })
 		.then(function(dbArticles) {
-			res.json({ ok: true });
+			db.Article.countDocuments({ saved: true }, function(err, data) {
+				console.log("before data");
+				res.json({ data });
+				// console.log(data);
+			});
 		})
 		.catch(function(err) {
 			res.json({ ok: false, error: err });
 		});
 	//here we store the ID supplied by the client. We use the ID to update.
 });
+///DONT LOOOK DOWN HERE//
 
 // GET route for saved articles //
 app.get("/saved-articles", function(req, res) {
@@ -101,15 +105,44 @@ app.get("/saved-articles", function(req, res) {
 		res.render("saved", { db_articles: dbArticles });
 	});
 });
-
+// GET route to clear articles //
 app.get("/clear", function(req, res) {
 	db.Article.remove({}).then(function() {
 		res.render("index");
 	});
 });
 
-// POST route to add to saved articles //
-app.post("/saved-articles", function(req, res) {});
+//POST route to add comments //
+app.put("/save-comment/:id", function(req, res) {
+	console.log(req.body);
+	db.Comment.create(req.body)
+		.then(function(dbComment) {
+			return db.Comment.findOneAndUpdate(
+				{ _id: req.params.id },
+				{ comment: dbComment._id },
+				{ new: true }
+			);
+		})
+		.then(function(dbArticle) {
+			res.json({ ok: true });
+		})
+		.catch(function(err) {
+			res.json({ ok: false, error: err });
+		});
+});
+
+app.get("/save-comment/", function(req, res) {
+	db.Article.find({})
+		.populate("comments")
+		.then(function(dbArticles) {
+			res.json(dbArticles);
+		})
+		.catch(function(err) {
+			res.json({ ok: false, error: err });
+		});
+});
+//I need to make a get request to get all notes for the article and display them in a modal or div//
+//Add a button for notes//
 app.listen(PORT, function() {
 	console.log("Listening on port:%s", PORT);
 });
