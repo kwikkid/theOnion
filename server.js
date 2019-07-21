@@ -37,11 +37,8 @@ app.get("/", function(req, res) {
 app.get("/scrape", function(req, res) {
 	console.log("scraping...");
 	var result = [];
-	console.log("1");
 	axios.get("https://www.theonion.com/").then(function(response) {
-		console.log("2");
 		var $ = cheerio.load(response.data);
-		console.log("3");
 		$(".content-meta__headline__wrapper").each(function(i, element) {
 			console.log("result variable");
 			var content = {
@@ -56,8 +53,6 @@ app.get("/scrape", function(req, res) {
 				result.push(content);
 			}
 		});
-
-		console.log("4");
 
 		db.Article.create(result)
 			.then(function(dbArticle) {
@@ -74,13 +69,9 @@ app.get("/scrape", function(req, res) {
 
 // GET route for all articles //
 app.get("/articles", function(req, res) {
-	db.Article.find({})
-		.then(function(dbArticles) {
-			res.render("index", { db_articles: dbArticles });
-		})
-		.catch(function(err) {
-			res.json(err);
-		});
+	db.Article.find({}).then(function(dbArticles) {
+		res.render("index", { db_articles: dbArticles });
+	});
 });
 
 app.post("/saved-articles/:id", function(req, res) {
@@ -111,29 +102,30 @@ app.get("/clear", function(req, res) {
 		res.render("index");
 	});
 });
+//POST route to add comments to db //
 
-//POST route to add comments //
-app.put("/save-comment/:id", function(req, res) {
+//POST route to add comments to Article//
+app.post("/save-comment/:id", function(req, res) {
 	console.log(req.body);
 	db.Comment.create(req.body)
 		.then(function(dbComment) {
-			return db.Comment.findOneAndUpdate(
+			return db.Article.findOneAndUpdate(
 				{ _id: req.params.id },
 				{ comment: dbComment._id },
 				{ new: true }
 			);
 		})
 		.then(function(dbArticle) {
-			res.json({ ok: true });
+			res.json(dbArticle);
 		})
 		.catch(function(err) {
 			res.json({ ok: false, error: err });
 		});
 });
 
-app.get("/save-comment/", function(req, res) {
-	db.Article.find({})
-		.populate("comments")
+app.get("/save-comment/:id", function(req, res) {
+	db.Article.findOne({ _id: req.params.id })
+		.populate("comment")
 		.then(function(dbArticles) {
 			res.json(dbArticles);
 		})

@@ -1,7 +1,8 @@
 $(document).ready(function() {
 	$(".save-btn").on("click", function() {
+		let articleId = $(this).data("id");
 		let count = 0;
-		var articleId = $(this).data("id");
+		// let articleId = $(this).data("id");
 
 		var countData = {
 			articleId: articleId
@@ -27,29 +28,54 @@ $(document).ready(function() {
 		});
 	});
 
-	$(".add-comment").on("click", function() {
-		var articleId = $(this).data("id");
-		var div = $(this).closest(".result-div");
-		var button = $("<button/>", {
-			class: "btn btn-success save-comment"
-		})
-			.attr("data-id", articleId)
-			.html("Save");
+	$(".add").on("click", function() {
+		var articleId = $(this).attr("data-id");
+		console.log("this is the article Id: " + articleId);
+		var comment = $("#modal-" + articleId).val();
 
-		// ("<button type='button' class='btn save-comment btn-success' id=articleId>Save</button>");
-		div.append("<textarea></textarea>").after(button);
-		$(".save-comment").on("click", function() {
-			console.log(articleId);
-			$.ajax({
-				method: "PUT",
-				url: "/save-comment/" + articleId,
-				data: {
-					body: $("textarea").val()
-				}
-			}).then(function(response) {
-				console.log(response);
-			});
-			$("textarea").empty();
+		console.log("this is the comment" + comment);
+		var commentDiv = $(
+			"<div class='commentArea'>" +
+				comment +
+				"<span style='color:red'>x</span></div>"
+		);
+		console.log(comment);
+		$("#p-" + articleId).append(commentDiv);
+		$("span").on("click", function() {
+			$(this)
+				.closest(".commentArea")
+				.remove();
+		});
+
+		$.ajax({
+			method: "POST",
+			url: "/save-comment/" + articleId,
+			data: {
+				body: comment
+			}
+		}).then(function(data) {
+			console.log(data);
+			// $("#modal-" + articleId).empty();
+		}); //insert articleId)
+		//we send over the comment variable as an object.
+		//the server will create a comment in the db//
+		//it will find one Article with an id equal to req.params.id
+		//update article to use new: true//
+		//we want the query to return the article and its note//
+	});
+	$(".show-comments").on("click", function() {
+		var articleId = $(this).attr("button-id");
+		console.log("articleId" + articleId);
+		$.ajax({
+			method: "GET",
+			url: "/save-comment/" + articleId
+		}).then(function(data) {
+			console.log(data);
+			$("#p-" + articleId).append("<div id=all-comments>");
+			if (data.comment) {
+				var allComments = $("<div>" + data.comment.body + "</div>");
+				$("#all-comments").append(allComments);
+			}
 		});
 	});
 });

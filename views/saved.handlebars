@@ -1,25 +1,85 @@
 <div class="container-fluid">
-    <div id="articles-saved">
-        {{#each db_articles}}
-          {{#if this.saved}}
-          <div class="result-div">
-          <div class="row">
-              <div class="col-10">
+  <div id="articles-saved">
+    {{#each db_articles}} {{#if this.saved}}
+    <div class="result-div">
+      <div class="row">
+        <div class="col-10">
+          <h3>
+            <pre>{{this.title}}</pre>
+          </h3>
+          <pre>{{this.link}}</pre>
+        </div>
 
-                <h3>
-                    <pre>{{this.title}}</pre>
-                </h3>
-                <pre>{{this.link}}</pre>
-              </div>
-              <div class="col-2">
-                <button type="button" class="btn add-comment btn-success" data-id={{_id}}>Add Comment</button>
+        <div class="col-2">
+          <button
+            type="button"
+            class="btn add-comment btn-success"
+            data-id="{{_id}}"
+            data-toggle="modal"
+            data-target="#myModal-{{_id}}"
+          >
+            Add Comment
+          </button>
+
+          <!-- Modal -->
+          <div class="modal fade" id="myModal-{{_id}}" role="dialog">
+            <div class="modal-dialog">
+              <!-- Modal content-->
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal">
+                    &times;
+                  </button>
+                  <h4 class="modal-title" modal-title-id={{this._id}}>
+                    Comment for Article Id {{this._id}}
+                  </h4>
+                                    <button
+                    type="button"
+                    class="btn btn-primary show-comments"
+                    button-id={{this._id}}
+
+
+                  >
+                    Show Comments
+                  </button>
+                </div>
+                <div class="modal-body">
+
+          <form role="form">
+            <div class="form-group">
+              <label for="Comment"></span>Comment</label>
+              <input type="text" id=modal-{{this._id}} class="form-control" placeholder="Add Comment">
+            </div>
+                  <p id=p-{{this._id}}></p>
+                </div>
+                <div class="modal-footer">
+                  <button
+                    type="button"
+                    class="btn btn-default"
+                    data-dismiss="modal"
+                  >
+                    Close
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-default add"
+                    data-id={{this._id}}
+                  >
+                    Add Comment
+                  </button>
+
+                </div>
               </div>
             </div>
           </div>
-                {{/if}}
-                  {{/each}}
-              
+          <!--End Modal -->
+        </div>
+        <!--End of Row -->
       </div>
-
-
+    </div>
+      <!--Result div -->
+      {{/if}} {{/each}}
+    </div>
+  </div>
 </div>
+
