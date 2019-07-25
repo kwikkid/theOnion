@@ -26,7 +26,7 @@ app.engine("handlebars", exphbs({ defaultLayout: "main" }));
 app.set("view engine", "handlebars");
 
 // Connect to Mongo DB //
-var MONGOD_URI = process.env.MONGODB_URI || "mongodb://localhost/theOnionapp";
+var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/theOnionapp";
 mongoose.connect(MONGODB_URI);
 // mongoose.connect("mongodb://localhost/theOnionApp", { useNewUrlParser: true });
 
